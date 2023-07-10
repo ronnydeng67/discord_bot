@@ -3,6 +3,7 @@ const { REST, Routes } = require('discord.js');
 const { clientId, guildId, token } = require('./config.json');
 const fs = require('node:fs');
 const path = require('node:path');
+const internal = require('node:stream');
 
 const client = new Client({
     intents: [
@@ -26,6 +27,7 @@ for (const folder of commandFolders) {
 	for (const file of commandFiles) {
 		const filePath = path.join(commandsPath, file);
 		const command = require(filePath);
+        client.commands.set(command.data.name, command)
 		if ('data' in command && 'execute' in command) {
 			commands.push(command.data.toJSON());
 		} else {
@@ -44,7 +46,7 @@ const rest = new REST().setToken(token);
 
 		// The put method is used to fully refresh all commands in the guild with the current set
 		const data = await rest.put(
-			Routes.applicationGuildCommands(clientId, guildId),
+			Routes.applicationGuildCommands(clientId, "1127680749865271468"),
 			{ body: commands },
 		);
 
@@ -54,3 +56,25 @@ const rest = new REST().setToken(token);
 		console.error(error);
 	}
 })();
+
+
+client.once("ready", () => {
+    console.log("Bot is now online!")
+})
+
+client.on("interactionCreate", (interaction) => {
+
+    if (!interaction.isCommand()) return
+
+    const command = client.command.get(interaction.commandName)
+    if (!command) return
+
+    try {
+        command.execute(client, interaction)
+    } catch (error) {
+        interaction.reply({content: "There was a error executing this command", ephemeral:true})
+    }
+})
+
+
+client.login(token)
