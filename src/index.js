@@ -66,7 +66,7 @@ client.on("interactionCreate", (interaction) => {
 
     if (!interaction.isCommand()) return
 
-    const command = client.command.get(interaction.commandName)
+    const command = client.commands.get(interaction.commandName)
     if (!command) return
 
     try {
