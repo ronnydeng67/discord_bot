@@ -1,5 +1,7 @@
 const { SlashCommandBuilder } = require("discord.js");
 const { joinVoiceChannel } = require('@discordjs/voice');
+const { youtube_api } = require("../config.json")
+const { search } = require("youtube-search");
 
 
 module.exports = {
