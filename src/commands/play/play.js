@@ -1,9 +1,9 @@
-const { SlashCommandBuilder } = require("discord.js");
+const { SlashCommandBuilder, Message } = require("discord.js");
 const { joinVoiceChannel } = require('@discordjs/voice');
 const { youtube_api } = require("../../config.json")
 const  search  = require("youtube-search");
 const opts = {
-    maxRes: 25,
+    maxRes: 10,
     key: youtube_api,
     type: 'video'
 };
@@ -29,7 +29,16 @@ module.exports = {
         const songs = await search(song_name, opts, function(err, results){
             if(err) return console.log(err)
 
-            console.log(results);
+            // console.log(results);
+            if (results) {
+                // let youtubeResults = results.results
+                let i = 0
+                let titles = results.map(result => {
+                    i++
+                    return i + ")" + result.title
+                })
+                
+            }
         })
     }
     
