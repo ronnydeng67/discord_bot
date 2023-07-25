@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, Message } = require("discord.js");
-const { joinVoiceChannel, AudioPlayerStatus, createAudioPlayer, createAudioResource } = require('@discordjs/voice');
+const { joinVoiceChannel, AudioPlayerStatus, createAudioPlayer, createAudioResource, NoSubscriberBehavior } = require('@discordjs/voice');
 const { youtube_api } = require("../../config.json");
 const  search  = require("youtube-search");
 const opts = {
@@ -26,28 +26,35 @@ module.exports = {
             //     guildId: interaction.member.voice.channel.guild.id,
             //     adapterCreator: interaction.member.voice.channel.guild.voiceAdapterCreator,
             // })
-            const player = createAudioPlayer();
-            console.log("hererr")
-            player.on(AudioPlayerStatus.Playing, () => {
-                console.log("audio started playing")
-            })
-            player.on('error', error => {
-                console.log(`Error: ${error.message}`)
-            })
-            let resource = createAudioResource('/Users/ronnydeng/Desktop/discord_bot/src/assets/file.mp3')
-            player.play(resource)
-
-
-
+            // const player = createAudioPlayer();
+            const player = createAudioPlayer({
+                behaviors: {
+                    noSubscriber: NoSubscriberBehavior.Pause,
+                },
+            });
             const connection = joinVoiceChannel({
                 channelId: interaction.member.voice.channel.id,
                 guildId: interaction.member.voice.channel.guild.id,
                 adapterCreator: interaction.member.voice.channel.guild.voiceAdapterCreator,
             })
 
+            const subscription = connection.subscribe(player)ç
+
+            player.on(AudioPlayerStatus.Playing, () => {
+                console.log("audio started playing")
+            })
+            player.on('error', error => {
+                console.log(`Error: ${error.message}`)
+            })
+            const resource = createAudioResource('/Users/ronnydeng/Desktop/discord_bot/src/assets/file.ogg')
+            player.play(resource)
+
+
+
+            
+
             interaction.reply("create voice connection")
 
-            const subscription = connection.subscribe(player)
 
             if (subscription) {
                 setTimeout(() => {
