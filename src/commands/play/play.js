@@ -1,5 +1,7 @@
 const { SlashCommandBuilder, Message } = require("discord.js");
-const { joinVoiceChannel, AudioPlayerStatus, createAudioPlayer, createAudioResource, NoSubscriberBehavior } = require('@discordjs/voice');
+const { joinVoiceChannel, AudioPlayerStatus, createAudioPlayer, createAudioResource, NoSubscriberBehavior, generateDependencyReport, VoiceConnectionStatus, StreamType } = require('@discordjs/voice');
+const { createReadStream } = require('node:fs');
+const { join } = require('node:path');
 const { youtube_api } = require("../../config.json");
 const  search  = require("youtube-search");
 const opts = {
@@ -7,6 +9,8 @@ const opts = {
     key: youtube_api,
     type: 'video'
 };
+
+// console.log(generateDependencyReport());
 
 
 module.exports = {
@@ -21,12 +25,6 @@ module.exports = {
         if (!interaction.member.voice.channel) {
             return interaction.reply({content: "You must join a voice channel to play song", ephemeral:true})
         } else {
-            // joinVoiceChannel({
-            //     channelId: interaction.member.voice.channel.id,
-            //     guildId: interaction.member.voice.channel.guild.id,
-            //     adapterCreator: interaction.member.voice.channel.guild.voiceAdapterCreator,
-            // })
-            // const player = createAudioPlayer();
             const player = createAudioPlayer({
                 behaviors: {
                     noSubscriber: NoSubscriberBehavior.Pause,
@@ -36,9 +34,19 @@ module.exports = {
                 channelId: interaction.member.voice.channel.id,
                 guildId: interaction.member.voice.channel.guild.id,
                 adapterCreator: interaction.member.voice.channel.guild.voiceAdapterCreator,
-            })
+            });
 
-            const subscription = connection.subscribe(player)ç
+            connection.on(VoiceConnectionStatus.Ready, () => {
+                console.log('The connection has entered the Ready state - ready to play audio!');
+            });
+
+            const subscription = connection.subscribe(player)
+            // const resource = createAudioResource('/Users/ronnydeng/Desktop/discord_bot/src/assets/file.mp3')
+            let resource = createAudioResource(join('/Users/ronnydeng/Desktop/discord_bot/src/assets', 'file.mp3'));
+            // resource = createAudioResource(createReadStream(join(__dirname, '/Users/ronnydeng/Desktop/discord_bot/src/assets/file.ogg'), {
+            //     inputType: StreamType.OggOpus,
+            // }));
+            player.play(resource)
 
             player.on(AudioPlayerStatus.Playing, () => {
                 console.log("audio started playing")
@@ -46,12 +54,6 @@ module.exports = {
             player.on('error', error => {
                 console.log(`Error: ${error.message}`)
             })
-            const resource = createAudioResource('/Users/ronnydeng/Desktop/discord_bot/src/assets/file.ogg')
-            player.play(resource)
-
-
-
-            
 
             interaction.reply("create voice connection")
 
