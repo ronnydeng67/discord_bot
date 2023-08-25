@@ -7,8 +7,10 @@ const path = require('node:path');
 
 const client = new Client({
     intents: [
-        GatewayIntentBits.Guilds,
-        GatewayIntentBits.GuildVoiceStates,
+        // GatewayIntentBits.Guilds,
+        // GatewayIntentBits.GuildVoiceStates,
+		"Guilds",
+		"GuildVoiceStates",
     ],
 });
 

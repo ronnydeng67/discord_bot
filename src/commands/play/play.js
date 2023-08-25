@@ -10,7 +10,7 @@ const opts = {
     type: 'video'
 };
 
-// console.log(generateDependencyReport());
+console.log(generateDependencyReport());
 
 
 module.exports = {
